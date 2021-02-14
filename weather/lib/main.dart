@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:weather/StatesEvents/WeatherEvent.dart';
 import 'package:weather/StatesEvents/WeatherState.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather/gradient.dart';
+import 'package:weather/models/Weather.dart';
 import 'BLoC/WeatherBloc.dart';
 import 'components/MainScreen.dart';
 import 'search.dart';
@@ -39,7 +41,8 @@ class _MyHomePageState extends State<MyHomePage> {
         builder: (context, state) {
           if (state is WeatherLoadSuccess) {
             return Scaffold(
-              appBar: AppBar(
+              appBar:
+              AppBar(
                 elevation: 0,
                 backgroundColor: Color.fromRGBO(0, 0, 0, 0),
                 actions: [
@@ -56,11 +59,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   )
                 ],
               ),
-              body: Padding(
-                padding: EdgeInsets.only(top: 64),
-                child: MainScreen(
-                    weather: state.weather, hourlyWeather: state.hourlyWeather),
-              ),
+              body: _buildGradientContainer(
+                  state.weather.status,
+                  Padding(
+                    padding: EdgeInsets.only(top: 64),
+                    child: MainScreen(
+                        weather: state.weather,
+                        hourlyWeather: state.hourlyWeather),
+                  )),
             );
           }
           return Scaffold(
@@ -72,4 +78,30 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+GradientContainer _buildGradientContainer(WeatherCondition status, Widget child) {
+  GradientContainer container;
+  switch (status) {
+    case WeatherCondition.clear:
+    case WeatherCondition.fewCloudy:
+      container = GradientContainer(color: Colors.yellow, child: child);
+      break;
+    case WeatherCondition.cloudy:
+    case WeatherCondition.fullCloudy:
+    case WeatherCondition.rain:
+    case WeatherCondition.mist:
+      container = GradientContainer(color: Colors.indigo, child: child);
+      break;
+    case WeatherCondition.thunderstorm:
+    case WeatherCondition.shower:
+      container = GradientContainer(color: Colors.deepPurple, child: child);
+      break;
+    case WeatherCondition.snow:
+      container = GradientContainer(color: Colors.lightBlue, child: child);
+      break;
+    default:
+      container = GradientContainer(color: Colors.lightBlue, child: child);
+  }
+  return container;
 }
